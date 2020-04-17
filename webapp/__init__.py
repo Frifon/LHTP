@@ -1,5 +1,5 @@
 from flask import Flask, render_template, flash, redirect, url_for
-from webapp.model import db
+from webapp.model import db, Spanish, English
 
 from webapp.forms import SpanishForm
 
