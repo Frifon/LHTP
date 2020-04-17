@@ -5,32 +5,25 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
 
-class News(db.Model):
+defenitions = db.Table('defenitions',
+    db.Column('spanish_word_id', db.Integer, db.ForeignKey('spanish.id'), primary_key=True),
+    db.Column('english_word_id', db.Integer, db.ForeignKey('english.id'), primary_key=True)
+)
+
+class Spanish(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String, nullable=False)
-    url = db.Column(db.String, unique=True, nullable=False)
-    on_website = db.Column(db.DateTime, nullable=False)
-    text = db.Column(db.Text, nullable=True)
+    spanish_word = db.Column(db.String, unique=True, nullable=False)
+    score = db.Column(db.Float, primary_key=True, default=0)
+    defenitions = db.relationship('English', secondary=defenitions, lazy='subquery',
+        backref=db.backref('spanish', lazy=True))
 
     def __repr__(self):
-        return '<News {} {}>'.format(self.title, self.url)
+        return '<WordToLearn {} {}>'.format(self.spanish_word, self.score)
 
-class User(db.Model, UserMixin):
+
+
+class English(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), index = True, unique = True)
-    password = db.Column(db.String(20))
-    role = db.Column(db.String(10), index = True)
-
-    def set_password(self, password):
-        self.password = generate_password_hash(password)
-
-    def check_password(self, password):
-        return check_password_hash(self.password, password)
-
-    @property
-    def is_admin(self):
-    	return self.role == 'admin'
+    english_word = db.Column(db.String, nullable=False)
     
 
-    def __repr__(self):
-        return '<User {}>'.format(self.username)
